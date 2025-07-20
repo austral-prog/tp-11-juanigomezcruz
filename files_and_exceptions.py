@@ -1,17 +1,33 @@
 def read_file_to_dict(filename):
-    """Lee un archivo de ventas donde cada venta es producto:valor_de_venta;... y agrupa los valores por producto en una lista.
+    file_path = filename
+    objective_dict = dict()
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+            product_split = content.split(';')
+            for sell in product_split:
+                sell_split = sell.split(":")
+                sell_name = sell_split[0]
+                try:
+                    sell_value = float(sell_split[1])
+                except IndexError:
+                    print(f"Error: El formato de la línea '{sell}' es incorrecto.")
+                    continue
+                except ValueError:
+                    print(f"Error al convertir el valor de {sell_name}")
+                    continue
+                if sell_name not in objective_dict:
+                    objective_dict[sell_name] = [sell_value]
+                else:
+                    objective_dict[sell_name].append(sell_value)
+        return objective_dict
+    except FileNotFoundError:
+        print("Archivo no encontrado")
+        raise
 
-    :param filename: str - nombre del archivo a leer.
-    :return: dict - diccionario con listas de montos por producto.
-    :raises: FileNotFoundError - si el archivo no existe.
-    """
-    return {}
-
-
-def process_dict(data):
-    """Para cada producto, imprime el total de ventas y el promedio, en el orden natural del diccionario.
-
-    :param data: dict - diccionario a procesar.
-    :return: None
-    """
-    pass
+def process_dict(objective_dict):
+    new_obj_dict = dict()
+    for sell_name, sells_values in objective_dict.items():
+        total_sells = sum(sells_values)
+        average_sells = total_sells / len(sells_values)
+        print(f"{sell_name}: ventas totales ${total_sells:.2f}, promedio ${average_sells:.2f}")    
